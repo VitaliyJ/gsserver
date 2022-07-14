@@ -1,4 +1,4 @@
-module gsserver
+module github.com/VitaliyJ/gsserver
 
 go 1.18
 
