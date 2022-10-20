@@ -10,7 +10,7 @@ import (
 
 type Server struct {
 	Signals []os.Signal
-	Mux     *http.ServeMux
+	Mux     http.Handler
 	Addr    string
 }
 
