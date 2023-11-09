@@ -2,11 +2,14 @@ package gsserver
 
 import (
 	"context"
-	"golang.org/x/sync/errgroup"
 	"net/http"
 	"os"
 	"os/signal"
+
+	"golang.org/x/sync/errgroup"
 )
+
+type Option func(server *http.Server)
 
 type Server struct {
 	Signals []os.Signal
@@ -24,13 +27,17 @@ func (s *Server) SetSignals(sig ...os.Signal) {
 //
 // Farther it listens context Done channel and then
 // calls Shutdown for the http server
-func (s *Server) ListenAndServe(ctx context.Context) error {
+func (s *Server) ListenAndServe(ctx context.Context, options ...Option) error {
 	bCtx, cancel := context.WithCancel(ctx)
 	go s.notify(cancel)
 
 	httpServer := &http.Server{
 		Addr:    s.Addr,
 		Handler: s.Mux,
+	}
+
+	for i := range options {
+		options[i](httpServer)
 	}
 
 	g, gCtx := errgroup.WithContext(bCtx)
